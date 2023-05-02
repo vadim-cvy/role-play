@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Game from '@/inc/game/Game';
 import Description from './description/Description.vue';
 import GlobalMeta from './global-meta/GlobalMeta.vue';
 import Location from './location/Location.vue';
@@ -6,14 +7,15 @@ import UserAction from './user-action/UserAction.vue';
 
 const props = defineProps<{
   cssPrefix: string
-  time: string
-  location: string
-  description: string
 }>()
 
-defineEmits(['doAction'])
-
 const cssPrefix = props.cssPrefix + '__turn'
+
+const turn = Game.turn
+
+const
+  description = turn.description,
+  meta = turn.meta
 </script>
 
 <template>
@@ -24,21 +26,19 @@ const cssPrefix = props.cssPrefix + '__turn'
         :description="description"
       ></Description>
 
-      <UserAction
-        :css-prefix="cssPrefix"
-        @do-action="action => $emit( 'doAction', action )"
-      ></UserAction>
+      <UserAction :css-prefix="cssPrefix"></UserAction>
     </div>
 
-    <div :class="`${cssPrefix}__sidebar`">
+    <div :class="`${cssPrefix}__sidebar`" v-if="meta">
       <Location
         :css-prefix="cssPrefix"
-        :location="location"
+        :location="meta.location"
       ></Location>
 
       <GlobalMeta
         :css-prefix="cssPrefix"
-        :time="time"
+        :time="meta.time"
+        :date="meta.date"
       ></GlobalMeta>
     </div>
   </div>

@@ -1,15 +1,21 @@
 <script setup lang="ts">
+import Game from '@/inc/game/Game'
 import { ref } from 'vue'
 
 const props = defineProps<{
   cssPrefix: string
 }>()
 
-defineEmits(['doAction'])
-
 const action = ref( '' )
 
 const cssPrefix = props.cssPrefix + '__user-action'
+
+const doAction = () =>
+{
+  Game.turn.doAction( action.value )
+
+  action.value = ''
+}
 </script>
 
 <template>
@@ -21,7 +27,7 @@ const cssPrefix = props.cssPrefix + '__user-action'
 
     <button
       type="button"
-      @click="$emit( 'doAction', action )"
+      @click="doAction"
       :class="`${cssPrefix}__submit-button`"
     >
       Submit

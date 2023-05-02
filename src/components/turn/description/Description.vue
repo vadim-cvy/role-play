@@ -16,4 +16,8 @@ const cssPrefix = props.cssPrefix + '__description'
 </template>
 
 <style lang="scss" scoped>
+.game__turn__description
+{
+  margin-bottom: 1em;
+}
 </style>

@@ -2,6 +2,7 @@
 const props = defineProps<{
   cssPrefix: string
   time: string
+  date: string
 }>()
 
 const cssPrefix = props.cssPrefix + '__global-meta'
@@ -9,6 +10,10 @@ const cssPrefix = props.cssPrefix + '__global-meta'
 
 <template>
   <div :class="`${cssPrefix}`">
+    <p>
+      {{ date }}
+    </p>
+
     <p>
       {{ time }}
     </p>

@@ -48,6 +48,7 @@ const cssPrefix = props.cssPrefix + '__character'
   &__stats
   {
     display: flex;
+    font-size: 1.2em;
 
     &__item
     {

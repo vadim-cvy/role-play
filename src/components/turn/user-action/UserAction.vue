@@ -5,17 +5,11 @@ const props = defineProps<{
   cssPrefix: string
 }>()
 
-const cssPrefix = props.cssPrefix + '__user-action'
+defineEmits(['doAction'])
 
 const action = ref( '' )
 
-const performAction = () =>
-{
-  // todo: perform
-  console.log( action.value )
-
-  action.value = ''
-}
+const cssPrefix = props.cssPrefix + '__user-action'
 </script>
 
 <template>
@@ -27,7 +21,7 @@ const performAction = () =>
 
     <button
       type="button"
-      @click="performAction"
+      @click="$emit( 'doAction', action )"
       :class="`${cssPrefix}__submit-button`"
     >
       Submit

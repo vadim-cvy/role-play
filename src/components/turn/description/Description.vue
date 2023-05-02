@@ -10,7 +10,7 @@ const cssPrefix = props.cssPrefix + '__description'
 <template>
   <div :class="`${cssPrefix}`">
     <p>
-      {{ description }}
+      {{ description ? description : 'Loading...' }}
     </p>
   </div>
 </template>

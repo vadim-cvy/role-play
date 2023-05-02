@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import Turn from './components/turn/Turn.vue';
 import Character from './components/character/Character.vue';
+import { Configuration, OpenAIApi } from 'openai'
 
 const cssPrefix = 'game'
 
@@ -14,6 +15,48 @@ const inventoryItems = ref( [ 'test water', 'test bread' ] )
 const location = ref( 'test loc' )
 const time = ref( '1st Test 2029, 00:00' )
 const description = ref( 'Test description of the turn' )
+
+const openai = new OpenAIApi(new Configuration({
+  // todo: IMPORTANT - keep this code on backend as it contains API key.
+  // Don't forget to create new key and remove current one.
+  apiKey: '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',
+}))
+
+const doAction = ( action: string ) =>
+{
+  description.value = ''
+
+  openai.createChatCompletion({
+    // todo: set v.4
+    model: 'gpt-3.5-turbo',
+    messages: [
+      {
+        role: 'user',
+        // todo: set
+        content: action,
+      },
+    ]
+  })
+  // todo: set catch()
+  .then( httpResponse =>
+  {
+    const response = httpResponse.data.choices[0]
+
+    if ( response.finish_reason !== 'stop' )
+    {
+      // todo: handle this case
+      throw new Error( 'Unexpected finish reason!' )
+    }
+
+    if ( ! response.message )
+    {
+      // todo: handle this case
+      throw new Error( 'Something goes wrong!' )
+    }
+
+    description.value = response.message.content
+  })
+}
 </script>
 
 <template>
@@ -32,6 +75,7 @@ const description = ref( 'Test description of the turn' )
       :location="location"
       :time="time"
       :description="description"
+      @do-action="doAction"
     ></Turn>
   </div>
 </template>

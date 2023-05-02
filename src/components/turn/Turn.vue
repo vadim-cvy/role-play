@@ -11,6 +11,8 @@ const props = defineProps<{
   description: string
 }>()
 
+defineEmits(['doAction'])
+
 const cssPrefix = props.cssPrefix + '__turn'
 </script>
 
@@ -24,6 +26,7 @@ const cssPrefix = props.cssPrefix + '__turn'
 
       <UserAction
         :css-prefix="cssPrefix"
+        @do-action="action => $emit( 'doAction', action )"
       ></UserAction>
     </div>
 

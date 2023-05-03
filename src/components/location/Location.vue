@@ -1,21 +1,19 @@
 <script setup lang="ts">
+import Game from '@/inc/game/Game';
+
 const props = defineProps<{
   cssPrefix: string
-  money: number
-  items: string[]
 }>()
 
-const cssPrefix = props.cssPrefix + '__inventory'
+const cssPrefix = props.cssPrefix + '__location'
+
+const label = Game.location.label
 </script>
 
 <template>
   <div :class="`${cssPrefix}`">
     <p>
-      Money: {{ money }}
-    </p>
-
-    <p>
-      Inventory: {{ items.join( ', ' ) }}
+      Location: {{ label }}
     </p>
   </div>
 </template>

@@ -8,11 +8,11 @@ const props = defineProps<{
 
 const action = ref( '' )
 
-const cssPrefix = props.cssPrefix + '__user-action'
+const cssPrefix = props.cssPrefix + '__user-custom-action'
 
-const doAction = () =>
+const doUserAction = () =>
 {
-  Game.turn.doAction( action.value )
+  Game.doUserAction( action.value )
 
   action.value = ''
 }
@@ -27,7 +27,7 @@ const doAction = () =>
 
     <button
       type="button"
-      @click="doAction"
+      @click="doUserAction"
       :class="`${cssPrefix}__submit-button`"
     >
       Submit
@@ -36,7 +36,7 @@ const doAction = () =>
 </template>
 
 <style lang="scss" scoped>
-.game__turn__user-action
+.game__user-custom-action
 {
   &__text
   {

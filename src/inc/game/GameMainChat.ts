@@ -1,6 +1,6 @@
 import Chat from '@/inc/ai/Chat'
 
-class TurnChat extends Chat
+class GameMainChat extends Chat
 {
   constructor()
   {
@@ -21,4 +21,4 @@ class TurnChat extends Chat
   }
 }
 
-export default new TurnChat()
+export default new GameMainChat()

@@ -55,14 +55,16 @@ const screenImgURL = Game.location.img
 
   &__header
   {
+    position: relative;
+    z-index: 2;
     grid-row: 1/2;
     grid-column: 1/2;
-    border-bottom: $section-border;
+    background-color: rgba(0,0,0,.7);
   }
 
   &__screen
   {
-    grid-row: 2/3;
+    grid-row: 1/3;
     grid-column: 1/2;
     background-size: contain;
     background-position: center;

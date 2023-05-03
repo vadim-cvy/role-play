@@ -8,24 +8,28 @@ export default class Chat
     protected model: CreateChatCompletionRequest['model'] = 'gpt-3.5-turbo'
   ) {}
 
-  protected currentAPIRequest?: ReturnType<typeof OpenAI['createChatCompletion']>
+  protected readonly API_MAX_REQUESTS_PER_MIN = 3500
+
+  protected isPerformingAPIRequest = false
+
+  protected lastAPIResponseTime = 0
 
   protected pendingMessages: {
-    messageContent: string
-    resolve: ( assistantMessageContent: string ) => void
+    message: ChatCompletionRequestMessage
+    onSent: ( assistantMessageContent: string ) => void
   }[] = []
 
   public history: CreateChatCompletionRequest['messages'] = []
 
-  public sendUserMessageSave(
+  public sendMessageSave(
     content: string,
     prepareHistoryUserContent?: ( original: string ) => string,
     prepareHistoryAssistantContent?: ( original: string ) => string
   )
   {
-    const request = this.sendUserMessage( content )
+    const request = this.sendMessage( content )
 
-    request.then( assistantResponseContent =>
+    request.then( assistantMessageContent =>
     {
       this.history.push({
         role: 'user',
@@ -36,72 +40,93 @@ export default class Chat
         role: 'assistant',
         content:
           prepareHistoryAssistantContent ?
-          prepareHistoryAssistantContent( assistantResponseContent ) :
-          assistantResponseContent
+          prepareHistoryAssistantContent( assistantMessageContent ) :
+          assistantMessageContent
       })
     })
 
     return request
   }
 
-  public sendUserMessage( messageContent: string )
+  public sendMessage( messageContent: string )
   {
     return new Promise<string>( resolve =>
     {
-      if ( this.pendingMessages.length )
-      {
-        this.pendingMessages.push({
-          messageContent,
-          resolve
-        })
-
-        return
-      }
-
-      this.createAPIRequest([
-        ...this.history,
-        {
+      this.pendingMessages.push({
+        message: {
           role: 'user',
           content: messageContent,
-        }
-      ])
-      .then( response => resolve( this.extractResponseAssistantMessageContent( response ) ) )
-      .finally( () => setTimeout(
-        () =>
-        {
-          const pendingMessage = this.pendingMessages.shift()
-
-          if ( pendingMessage )
-          {
-            this.sendUserMessage( pendingMessage.messageContent ).then( assistantResponse =>
-              pendingMessage.resolve( assistantResponse )
-            )
-          }
         },
-        1000
-      ))
+        onSent: assistantMessageContent => resolve( assistantMessageContent ),
+      })
+
+      this.sendNextPending()
     })
   }
 
-  protected createAPIRequest( messages: CreateChatCompletionRequest['messages'] )
+  protected sendNextPending()
   {
-    this.currentAPIRequest = OpenAI.createChatCompletion({
-      model: this.model,
-      messages,
-    })
+    if ( this.isPerformingAPIRequest )
+    {
+      return
+    }
 
-    this.currentAPIRequest
-    // todo: handle
+    const
+      requestsMinInterval = 60 / this.API_MAX_REQUESTS_PER_MIN * 1000,
+      timeFromPrevRequest = Date.now() - this.lastAPIResponseTime
+
+    if ( timeFromPrevRequest < requestsMinInterval )
+    {
+      setTimeout(
+        () => this.sendNextPending(),
+        requestsMinInterval - timeFromPrevRequest
+      )
+
+      return
+    }
+
+    const pendingMessage = this.pendingMessages.shift()
+
+    if ( ! pendingMessage )
+    {
+      return
+    }
+
+    this.isPerformingAPIRequest = true
+
+    const requestMessages = [
+      ...this.history,
+      pendingMessage.message,
+    ]
+
+    OpenAI.createChatCompletion({
+      model: this.model,
+      messages: requestMessages,
+      // todo: improve. https://platform.openai.com/docs/api-reference/completions/create > Completions > Request Body
+      // todo: select the best model for different cases: https://platform.openai.com/account/rate-limits
+    })
+    .then( response =>
+    {
+      const assistantMessage = this.extractAPIRequestAssistantMessage( response )
+      pendingMessage.onSent( assistantMessage.content )
+    })
     .catch( error =>
     {
+      console.error( error )
+
+      // todo: handle
       throw new Error( 'Something goes wrong!' )
     })
-    .finally( () => this.currentAPIRequest = undefined )
+    .finally(() =>
+    {
+      this.isPerformingAPIRequest = false
+      this.lastAPIResponseTime = Date.now()
 
-    return this.currentAPIRequest
+      this.sendNextPending()
+    })
   }
 
-  protected extractResponseAssistantMessageContent( httpResponse: Awaited<ReturnType<typeof OpenAI['createChatCompletion']>> )
+  protected extractAPIRequestAssistantMessage( httpResponse: Awaited<ReturnType<typeof OpenAI['createChatCompletion']>> )
   {
     const response = httpResponse.data.choices[0]
 
@@ -116,7 +141,7 @@ export default class Chat
       // todo: handle this case
       throw new Error( 'Something goes wrong!' )
     }
-console.log( response.message.content )
-    return response.message.content
+
+    return response.message
   }
 }

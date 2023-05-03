@@ -6,12 +6,14 @@ export default class Turn
 {
   constructor()
   {
-    TurnChat.init().then( () => this.syncData() )
+    TurnChat.init().then( () => this.syncMeta() )
   }
 
   protected chat = TurnChat
 
   public readonly meta = ref<iTurnMeta | null>( null )
+
+  public readonly locationImg = ref( '' )
 
   public readonly description = ref( '' )
 
@@ -23,10 +25,10 @@ export default class Turn
       `Character action:
       ${action}`
 
-    this.chat.sendUserMessageSave( message ).then( () => this.syncData() )
+    this.chat.sendMessageSave( message ).then( () => this.syncMeta() )
   }
 
-  protected syncData()
+  protected syncMeta()
   {
     const message =
       `I have a JSON formatted meta data. But it may be outdated as I haven't synced it with the last action of my character and your last response. May you update JSON values if ones are outdated? Don't update or change data which is still actual.
@@ -42,8 +44,36 @@ export default class Turn
 
     this.description.value = this.chat.history[ this.chat.history.length - 1 ].content
 
-    this.chat.sendUserMessage( message ).then( response =>
+    this.chat.sendMessage( message ).then( response =>
+    {
+      const oldLocation = this.meta.value?.location
+
       this.meta.value = JSON.parse( response ) as iTurnMeta
-    )
+
+      if ( oldLocation !== this.meta.value.location )
+      {
+        this.syncLocationImg()
+      }
+    })
+  }
+
+  protected syncLocationImg()
+  {
+    this.locationImg.value = `https://via.placeholder.com/600x400?text=Location: ${this.meta.value?.location}`
+    // todo: commented out to save $ on API requsts
+    // this.chat.sendMessage(
+    //   `Provide me with the current location description which I'll use to generate the image with AI tool (DALL-E). I want picture to look like a screenshot from the PC game.
+
+    //   It is important to keep your message under 50 words.`
+    // )
+    // .then( locationDescription =>
+    // {
+    //   OpenAI.createImage({
+    //     prompt: locationDescription,
+    //     n: 1,
+    //     size: "1024x1024",
+    //   })
+    //   .then( response => this.locationImg.value = response.data.data[0].url || '' )
+    // })
   }
 }

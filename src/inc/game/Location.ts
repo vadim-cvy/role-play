@@ -35,7 +35,9 @@ class Location
     this._img.value =
       `https://via.placeholder.com/600x400?text=Location: ${this.label.value ? this.label.value : 'loading...'}`
 
-    // todo: commented out to save $ on API requsts
+    // todo: uncomment. It is commented out to save $ on API requsts
+    // todo: use another (free) account for images generation
+    // todo: generate 4 images: main and location objects (tell to prompt writer that objects should be large scaled so other things on location are barely visible - this will allow prevent location appearance conflict)
     // Game.chat.sendMessage(
     //   `Provide me with the current location description which I'll use to generate the image with AI tool (DALL-E). I want picture to look like a screenshot from the PC game.
 

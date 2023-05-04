@@ -14,6 +14,7 @@ server.use( bodyParser() )
 server.use( router.routes() )
 server.use( router.allowedMethods() )
 
+// todo: remove
 router.get( '/api/test/', ctx => ctx.body = 'test' )
 
 server.listen( port, () => console.log( `Server is running at http://localhost:${port}` ) )

@@ -2,7 +2,7 @@ import Koa = require( 'koa' )
 import Router = require( 'koa-router' )
 import bodyParser = require( 'koa-bodyparser' )
 import cors = require( '@koa/cors' )
-import database from './database'
+import Game from './game/Game'
 
 const
   server = new Koa(),
@@ -12,9 +12,22 @@ const
 server.use( cors() )
 server.use( bodyParser() )
 server.use( router.routes() )
-server.use( router.allowedMethods() )
+server.use( router.allowedMethods() );
 
-// todo: remove
-router.get( '/api/test/', ctx => ctx.body = 'test' )
+(async () =>
+{
+  const game = await Game.getInstance()
 
-server.listen( port, () => console.log( `Server is running at http://localhost:${port}` ) )
+  // todo: add id. currently it just returns the same for any request
+  router.get( '/api/saving-slot/', ctx => ctx.body = JSON.stringify( game.frontendData ) )
+
+  // router.post( '/api/user-action/', ctx =>
+  // {
+  //   // game.doUserAction( action )
+
+  //   // todo: return updated game data?
+  //   ctx.body = JSON.stringify( game.frontendData )
+  // })
+
+  server.listen( port, () => console.log( `Server is running at http://localhost:${port}` ) )
+})()

@@ -1,5 +1,5 @@
 import GameModule from "../GameModule";
-import ScenarioGPT from "./ScenarioGPT";
+import PlotGPT from "./PlotGPT";
 
 export default class GlobalGameModule extends GameModule
 {
@@ -8,7 +8,7 @@ export default class GlobalGameModule extends GameModule
     if ( ! this.instance )
     {
       this.instance = new this({
-        scenario: await ScenarioGPT.getInstance()
+        plot: await PlotGPT.getInstance()
       })
     }
 
@@ -17,7 +17,7 @@ export default class GlobalGameModule extends GameModule
 
   protected constructor(
     GPTs: {
-      scenario: ScenarioGPT
+      plot: PlotGPT
     }
   )
   {
@@ -39,8 +39,8 @@ export default class GlobalGameModule extends GameModule
 
   protected syncTurnDescription()
   {
-    const scenarioHistory = this.GPTs.scenario.history
+    const plotHistory = this.GPTs.plot.history
 
-    this.turnDescription = scenarioHistory[ scenarioHistory.length - 1 ].content
+    this.turnDescription = plotHistory[ plotHistory.length - 1 ].content
   }
 }

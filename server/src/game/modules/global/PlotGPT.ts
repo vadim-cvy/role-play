@@ -1,6 +1,6 @@
 import GPT from "../../../ai/gpt/GPT";
 
-export default class ScenarioGPT extends GPT
+export default class PlotGPT extends GPT
 {
   protected static get initialPrompt()
   {

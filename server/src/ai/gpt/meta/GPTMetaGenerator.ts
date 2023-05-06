@@ -10,7 +10,7 @@ export default class GPTMetaGenerator
 
   // todo: this should be populated by (another?) gpt on createInstance()
   protected readonly meta: tGPTMetaObject = {
-    // todo: move to scenario metagenerator
+    // todo: move to plot metagenerator
     time: {
       format: 'yyyy-mm-dd hh:mm:ss',
       purpose: 'Represents ingame date and time.',

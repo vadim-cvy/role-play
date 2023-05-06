@@ -56,6 +56,6 @@ export default class Game implements iHasFrontendData
   //     `Character action:
   //     ${action}`
 
-  //   scenarioChat.sendMessageSave( message ).then( () => this.syncMeta() )
+  //   plotChat.sendMessageSave( message ).then( () => this.syncMeta() )
   // }
 }
